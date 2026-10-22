@@ -6,11 +6,11 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/lotto-random/server
+WorkingDirectory=/opt/lotto-random-src/server
 ExecStart=/usr/bin/env node server.mjs
 # ADMIN_PASSWORD ແລະ ຄ່າອື່ນໆ ຢູ່ໃນໄຟລ໌ນີ້ (ບໍ່ເອົາຂຶ້ນ git)
 EnvironmentFile=/etc/lotto-api.env
-Environment=PORT=3001
+Environment=PORT=3011
 Environment=DATA_DIR=/var/lib/lotto-api
 Restart=always
 RestartSec=3

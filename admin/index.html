@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>Admin · ສຸ່ມຫວຍຈາກສະຖິຕິ</title>
+  <title>Admin · ທຸກເວັບ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap">
-  <link rel="stylesheet" href="../style.css?v=202610221300">
-  <link rel="stylesheet" href="admin.css?v=202610221300">
+  <link rel="stylesheet" href="../style.css?v=202610221700">
+  <link rel="stylesheet" href="admin.css?v=202610221700">
 </head>
 <body>
   <header>
@@ -37,6 +37,8 @@
         </span>
       </div>
 
+      <nav id="siteTabs" class="tabs" role="tablist" aria-label="ເລືອກເວັບ"></nav>
+
       <section class="kpis" id="kpis"></section>
 
       <section class="card">
@@ -57,8 +59,13 @@
       </section>
 
       <section class="card">
+        <h2>ໜ້າທີ່ເປີດຫຼາຍ (30 ມື້)</h2>
+        <div id="pages" class="pages"></div>
+      </section>
+
+      <section class="card">
         <div class="fb-head">
-          <h2>Feedback <span id="unreadBadge" class="badge" hidden></span></h2>
+          <h2>Feedback</h2>
           <label class="hint"><input type="checkbox" id="onlyUnread"> ສະເພາະທີ່ຍັງບໍ່ໄດ້ອ່ານ</label>
         </div>
         <div id="fbList" class="fb-list"></div>
@@ -70,6 +77,6 @@
     </p>
   </main>
 
-  <script src="admin.js?v=202610221300"></script>
+  <script src="admin.js?v=202610221700"></script>
 </body>
 </html>

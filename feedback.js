@@ -16,7 +16,7 @@
 
   // ---------- ນັບຄົນເຂົ້າ ----------
   if (location.protocol.startsWith("http")) {
-    post("/track", { type: "view", ref: document.referrer }).catch(() => {});
+    post("/track", { type: "view", path: location.pathname, ref: document.referrer }).catch(() => {});
     $("generate")?.addEventListener("click", () => post("/track", { type: "generate" }).catch(() => {}));
   }
 
