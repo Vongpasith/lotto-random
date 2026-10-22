@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="lo">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin · ສຸ່ມຫວຍຈາກສະຖິຕິ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap">
+  <link rel="stylesheet" href="../style.css?v=202610221300">
+  <link rel="stylesheet" href="admin.css?v=202610221300">
+</head>
+<body>
+  <header>
+    <h1>🔐 Admin</h1>
+    <p class="sub"><a href="../">← ກັບໜ້າເວັບ</a></p>
+  </header>
+
+  <main>
+    <!-- ເຂົ້າສູ່ລະບົບ -->
+    <section id="loginView" class="card login" hidden>
+      <h2>ເຂົ້າສູ່ລະບົບ</h2>
+      <form id="loginForm" class="controls">
+        <input id="password" type="password" autocomplete="current-password" placeholder="ລະຫັດຜ່ານ" required>
+        <button class="primary" type="submit">ເຂົ້າສູ່ລະບົບ</button>
+      </form>
+      <p id="loginMsg" class="hint" role="status"></p>
+    </section>
+
+    <!-- dashboard -->
+    <div id="dashView" hidden>
+      <div class="toolbar">
+        <span id="updated" class="hint"></span>
+        <span>
+          <button id="refreshBtn">ໂຫຼດໃໝ່</button>
+          <button id="logoutBtn">ອອກຈາກລະບົບ</button>
+        </span>
+      </div>
+
+      <section class="kpis" id="kpis"></section>
+
+      <section class="card">
+        <h2>ຄົນເຂົ້າ 30 ມື້ຫຼ້າສຸດ</h2>
+        <div class="legend"><span class="sw uniq"></span> ຄົນ (ບໍ່ຊ້ຳ) <span class="sw views"></span> ຄັ້ງທີ່ເປີດໜ້າ</div>
+        <div id="chart" class="chart"></div>
+      </section>
+
+      <section class="grid2">
+        <div class="card">
+          <h2>ອຸປະກອນ (30 ມື້)</h2>
+          <div id="devices"></div>
+        </div>
+        <div class="card">
+          <h2>ມາຈາກໃສ (30 ມື້)</h2>
+          <div id="refs"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="fb-head">
+          <h2>Feedback <span id="unreadBadge" class="badge" hidden></span></h2>
+          <label class="hint"><input type="checkbox" id="onlyUnread"> ສະເພາະທີ່ຍັງບໍ່ໄດ້ອ່ານ</label>
+        </div>
+        <div id="fbList" class="fb-list"></div>
+      </section>
+    </div>
+
+    <p id="offline" class="card hint" hidden>
+      ໜ້າ admin ໃຊ້ໄດ້ສະເພາະທີ່ <a href="https://lotto-ramdom.online/admin/">lotto-ramdom.online/admin</a>
+    </p>
+  </main>
+
+  <script src="admin.js?v=202610221300"></script>
+</body>
+</html>

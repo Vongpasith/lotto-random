@@ -17,7 +17,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap">
-  <link rel="stylesheet" href="style.css?v=202610221200">
+  <link rel="stylesheet" href="style.css?v=202610221300">
 </head>
 <body>
   <header>
@@ -87,6 +87,26 @@
       <div id="lookupResult" class="lookup"></div>
     </section>
 
+    <section class="card">
+      <h2>💬 ແນະນຳ / ຕິຊົມ</h2>
+      <p class="hint">ມີຫຍັງຢາກໃຫ້ປັບປຸງ ຫຼື ພົບບັນຫາ ບອກໄດ້ເລີຍ</p>
+      <form id="feedbackForm" class="feedback" novalidate>
+        <div class="stars" role="radiogroup" aria-label="ໃຫ້ຄະແນນ">
+          <button type="button" data-v="1" aria-label="1 ດາວ">★</button>
+          <button type="button" data-v="2" aria-label="2 ດາວ">★</button>
+          <button type="button" data-v="3" aria-label="3 ດາວ">★</button>
+          <button type="button" data-v="4" aria-label="4 ດາວ">★</button>
+          <button type="button" data-v="5" aria-label="5 ດາວ">★</button>
+        </div>
+        <textarea id="fbMessage" rows="4" maxlength="2000" placeholder="ຂຽນຂໍ້ຄວາມທີ່ນີ້..." required></textarea>
+        <input id="fbContact" maxlength="200" placeholder="ຊ່ອງທາງຕິດຕໍ່ກັບ (ບໍ່ໃສ່ກໍໄດ້) ເຊັ່ນ ເບີ WhatsApp">
+        <!-- ກັບດັກ bot: ຄົນບໍ່ເຫັນຊ່ອງນີ້ -->
+        <input name="website" id="fbWebsite" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+        <button type="submit" class="primary">ສົ່ງ</button>
+        <span id="fbStatus" class="hint" role="status"></span>
+      </form>
+    </section>
+
     <section class="card donate">
       <h2>☕ ສະໜັບສະໜູນຜູ້ພັດທະນາ</h2>
       <p class="hint">ຖ້າມັກເວັບນີ້ ສາມາດ Donate ໄດ້ຜ່ານ LAO QR — ສະແກນດ້ວຍແອັບທະນາຄານໃດກໍໄດ້ທີ່ຮອງຮັບ LAPNet</p>
@@ -97,10 +117,12 @@
     <p class="disclaimer">
       ⚠️ ຫວຍແຕ່ລະງວດສຸ່ມແຍກກັນ ທຸກເລກມີໂອກາດຖືກ 6 ໂຕ ເທົ່າກັນຄື 1 ໃນ 1,000,000
       ສະຖິຕິໃນໜ້ານີ້ບອກໄດ້ພຽງແຕ່ວ່າ "ອະດີດ" ອອກຫຍັງເລື້ອຍ ບໍ່ໄດ້ເຮັດໃຫ້ໂອກາດຖືກງວດໜ້າສູງຂຶ້ນ — ໃຊ້ເພື່ອຄວາມມ່ວນເທົ່ານັ້ນ
+      <br>ເວັບນີ້ນັບຈຳນວນຄົນເຂົ້າແບບບໍ່ລະບຸຕົວຕົນ (ບໍ່ເກັບ IP ຫຼື ຂໍ້ມູນສ່ວນຕົວ)
     </p>
   </main>
 
-  <script src="data.js?v=202610221200"></script>
-  <script src="app.js?v=202610221200"></script>
+  <script src="data.js?v=202610221300"></script>
+  <script src="app.js?v=202610221300"></script>
+  <script src="feedback.js?v=202610221300"></script>
 </body>
 </html>

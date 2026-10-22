@@ -1,0 +1,25 @@
+# systemd service ສຳລັບ backend (feedback + ສະຖິຕິ + admin)
+# ຕິດຕັ້ງ: ເບິ່ງ server/README.md
+[Unit]
+Description=lotto-random API (feedback, stats, admin)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/lotto-random/server
+ExecStart=/usr/bin/env node server.mjs
+# ADMIN_PASSWORD ແລະ ຄ່າອື່ນໆ ຢູ່ໃນໄຟລ໌ນີ້ (ບໍ່ເອົາຂຶ້ນ git)
+EnvironmentFile=/etc/lotto-api.env
+Environment=PORT=3001
+Environment=DATA_DIR=/var/lib/lotto-api
+Restart=always
+RestartSec=3
+DynamicUser=yes
+StateDirectory=lotto-api
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target
