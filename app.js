@@ -3,11 +3,6 @@
   const $ = (id) => document.getElementById(id);
   let stats = null;
 
-  // ແປງຂໍ້ຄວາມເປັນລາຍການເລກ 6 ໂຕ (ຂ້າມແຖວທີ່ບໍ່ແມ່ນເລກ 6 ໂຕ)
-  function parseResults(text) {
-    return text.split(/\s+/).filter((s) => /^\d{6}$/.test(s));
-  }
-
   // ນັບຄວາມຖີ່: ເລກແຕ່ລະຫຼັກ, ເລກທ້າຍ 2 ໂຕ, ເລກທ້າຍ 3 ໂຕ
   function computeStats(results) {
     const pos = Array.from({ length: 6 }, () => Array(10).fill(0));
@@ -136,19 +131,9 @@
 
   // ເລີ່ມຕົ້ນ
   const initial = Array.isArray(window.LOTTO_RESULTS) ? window.LOTTO_RESULTS : [];
-  $("dataInput").value = initial.join("\n");
   load(initial);
 
   $("generate").addEventListener("click", renderGenerated);
   $("lookupBtn").addEventListener("click", renderLookup);
   $("lookup").addEventListener("keydown", (e) => { if (e.key === "Enter") renderLookup(); });
-  $("reload").addEventListener("click", () => {
-    const res = parseResults($("dataInput").value);
-    if (!res.length) {
-      $("dataMsg").textContent = "ບໍ່ພົບເລກ 6 ໂຕ ໃນຂໍ້ມູນ";
-      return;
-    }
-    load(res);
-    $("dataMsg").textContent = `ຄຳນວນໃໝ່ແລ້ວ ${res.length} ງວດ`;
-  });
 })();
