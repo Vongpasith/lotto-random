@@ -1,0 +1,37 @@
+# ດຶງຜົນຫວຍລາວອັດຕະໂນມັດ ຈັນ–ສຸກ ຫຼັງອອກລາງວັນ (ເວລາລາວ = UTC+7)
+name: Update lottery results
+
+on:
+  schedule:
+    - cron: "45 14 * * 1-5" # 21:45 ເວລາລາວ
+    - cron: "30 17 * * 1-5" # 00:30 ເວລາລາວ (ລອງອີກຄັ້ງ ຖ້າເວັບອັບເດດຊ້າ)
+  workflow_dispatch: {} # ກົດແລ່ນເອງໄດ້ຈາກແຖບ Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-results
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch new results
+        run: node scripts/update-results.mjs
+      - name: Commit if changed
+        run: |
+          if git diff --quiet; then
+            echo "ບໍ່ມີການປ່ຽນແປງ"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lotto_result data.js
+          git commit -m "Update lottery results $(TZ=Asia/Vientiane date +%Y-%m-%d)"
+          git push
