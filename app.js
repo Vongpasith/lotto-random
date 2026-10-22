@@ -109,13 +109,18 @@
       return;
     }
     // ທຽບກັບເລກທ້າຍຂອງຜົນຫວຍທີ່ຜ່ານມາ
-    const hits = stats.results.filter((r) => r.endsWith(q));
+    const hits = [];
+    stats.results.forEach((r, i) => { if (r.endsWith(q)) hits.push({ num: r, date: dates[i] }); });
+    hits.reverse(); // ງວດໃໝ່ກ່ອນ
     let html = `ເລກທ້າຍ <b>${q}</b> ເຄີຍອອກ <b>${hits.length}</b> ຄັ້ງ ຈາກ ${stats.n} ງວດ`;
     if (q.length <= 3) {
       const expected = stats.n / 10 ** q.length;
       html += ` (ຄ່າສະເລ່ຍຖ້າສຸ່ມລ້ວນ ≈ ${expected.toFixed(2)} ຄັ້ງ)`;
     }
-    if (hits.length) html += `<ul>${hits.slice(0, 20).map((h) => `<li>${h}</li>`).join("")}</ul>`;
+    if (hits.length) {
+      html += `<ul>${hits.slice(0, 20).map((h) =>
+        `<li>${h.num}${h.date ? ` <span class="hint">— ${formatDate(h.date)}</span>` : ""}</li>`).join("")}</ul>`;
+    }
     if (q.length === 6) html += `ຄະແນນສະຖິຕິຂອງເລກນີ້: <b>${statScore(q).toFixed(2)}x</b>`;
     box.innerHTML = html;
   }
@@ -129,9 +134,50 @@
     $("results").innerHTML = "";
   }
 
+  // ---------- ຜົນຫວຍແຕ່ລະງວດ ----------
+  const DAYS = ["ອາທິດ", "ຈັນ", "ອັງຄານ", "ພຸດ", "ພະຫັດ", "ສຸກ", "ເສົາ"];
+  const MONTHS = ["ມັງກອນ", "ກຸມພາ", "ມີນາ", "ເມສາ", "ພຶດສະພາ", "ມິຖຸນາ",
+    "ກໍລະກົດ", "ສິງຫາ", "ກັນຍາ", "ຕຸລາ", "ພະຈິກ", "ທັນວາ"];
+  const HISTORY_STEP = 20;
+  let historyShown = 0;
+
+  // "2026-10-21" → "ວັນພຸດ 21 ຕຸລາ 2026"
+  function formatDate(iso) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+    if (!m) return "";
+    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    return `ວັນ${DAYS[d.getUTCDay()]} ${+m[3]} ${MONTHS[+m[2] - 1]} ${m[1]}`;
+  }
+
+  function drawRow(num, date, latest) {
+    return `<tr${latest ? ' class="latest"' : ""}>
+      <td class="date">${formatDate(date) || "—"}${latest ? ' <span class="badge">ລ່າສຸດ</span>' : ""}</td>
+      <td class="n6">${num}</td>
+      <td>${num.slice(-4)}</td>
+      <td>${num.slice(-3)}</td>
+      <td>${num.slice(-2)}</td>
+    </tr>`;
+  }
+
+  function renderHistory(more) {
+    const total = stats.results.length;
+    historyShown = more ? Math.min(total, historyShown + HISTORY_STEP) : Math.min(total, HISTORY_STEP);
+    let rows = "";
+    for (let k = 0; k < historyShown; k++) {
+      const i = total - 1 - k; // ງວດໃໝ່ຢູ່ເທິງ
+      rows += drawRow(stats.results[i], dates[i], k === 0);
+    }
+    $("historyBody").innerHTML = rows;
+    $("historyMore").hidden = historyShown >= total;
+    $("historyInfo").textContent = `ສະແດງ ${historyShown} ຈາກ ${total} ງວດ`;
+  }
+
   // ເລີ່ມຕົ້ນ
   const initial = Array.isArray(window.LOTTO_RESULTS) ? window.LOTTO_RESULTS : [];
+  const dates = Array.isArray(window.LOTTO_DATES) ? window.LOTTO_DATES : [];
   load(initial);
+  renderHistory(false);
+  $("historyMore").addEventListener("click", () => renderHistory(true));
 
   $("generate").addEventListener("click", renderGenerated);
   $("lookupBtn").addEventListener("click", renderLookup);

@@ -161,3 +161,22 @@ button:active { transform: scale(.97); }
   border-radius: 12px;
   background: #fff;
 }
+
+/* ---------- ຜົນຫວຍແຕ່ລະງວດ ---------- */
+.history { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.history th, .history td { padding: 8px 6px; border-bottom: 1px solid var(--border); text-align: center; }
+.history th { font-weight: normal; color: var(--muted); font-size: .85rem; }
+.history td.date { text-align: left; white-space: nowrap; font-size: .9rem; }
+.history td.n6 { font-family: ui-monospace, monospace; font-weight: bold; font-size: 1.15rem; letter-spacing: .08em; color: var(--accent); }
+.history tr.latest { background: rgba(var(--heat), .08); }
+.history .badge { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 6px; background: var(--gold); color: #fff; font-size: .7rem; vertical-align: middle; }
+.history-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+
+@media (max-width: 600px) {
+  /* ຈໍແຄບ: ເຊື່ອງ 4 ໂຕ ແລະ 3 ໂຕ ໃຫ້ພໍດີຈໍ (ຍັງເຫັນໃນເລກ 6 ໂຕ) */
+  .history th:nth-child(3), .history td:nth-child(3),
+  .history th:nth-child(4), .history td:nth-child(4) { display: none; }
+  .history td.date { white-space: normal; font-size: .8rem; }
+  .history td.n6 { font-size: 1.05rem; }
+  .history-foot button { flex: 1 1 100%; }
+}
