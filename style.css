@@ -1,0 +1,163 @@
+:root {
+  --bg: #f6f4ef;
+  --card: #ffffff;
+  --text: #222;
+  --muted: #6b6b6b;
+  --accent: #c8102e;
+  --gold: #d4a017;
+  --border: #e5e1d8;
+  --heat: 200, 16, 46; /* ສີແດງ rgb ໃຊ້ກັບຕາຕະລາງຄວາມຖີ່ */
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15161a;
+    --card: #1f2127;
+    --text: #eee;
+    --muted: #a0a0a0;
+    --border: #33363e;
+    --heat: 240, 80, 100;
+  }
+}
+
+* { box-sizing: border-box; }
+/* ມືຖືບໍ່ຂະຫຍາຍຕົວໜັງສືເອງຕອນໝຸນຈໍ */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+img, table { max-width: 100%; }
+body {
+  margin: 0;
+  font-family: "Noto Sans Lao", "Phetsarath OT", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+header {
+  text-align: center;
+  padding: 32px 16px 8px;
+}
+h1 { margin: 0; font-size: clamp(1.4rem, 6vw, 2rem); line-height: 1.3; }
+h2 { margin: 0 0 12px; font-size: 1.15rem; }
+.sub, .hint { color: var(--muted); }
+.hint { font-size: .9rem; }
+
+main { max-width: 900px; margin: 0 auto; padding: 16px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid2 .card { margin-bottom: 0; }
+.grid2 { margin-bottom: 16px; }
+@media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.controls label { display: flex; flex-direction: column; font-size: .9rem; color: var(--muted); gap: 4px; }
+select, input, textarea, button {
+  font: inherit;
+  font-size: 16px; /* ນ້ອຍກວ່ານີ້ iPhone ຈະຊູມໜ້າເວັບເອງຕອນແຕະຊ່ອງພິມ */
+  padding: 8px 12px;
+  min-height: 44px; /* ປຸ່ມໃຫຍ່ພໍໃຫ້ນິ້ວກົດງ່າຍ */
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+input[type=number] { width: 90px; }
+#lookup { flex: 1; min-width: 0; }
+textarea { width: 100%; font-family: ui-monospace, monospace; margin: 8px 0; }
+button { cursor: pointer; }
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-weight: bold;
+  padding: 10px 24px;
+}
+button:active { transform: scale(.97); }
+
+.results { display: grid; gap: 10px; margin-top: 16px; }
+.ticket {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border: 2px dashed var(--gold);
+  border-radius: 10px;
+  animation: pop .3s ease;
+}
+.ticket .num {
+  font-family: ui-monospace, monospace;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: .25em;
+  color: var(--accent);
+}
+.ticket .meta { font-size: .85rem; color: var(--muted); text-align: right; }
+@keyframes pop { from { opacity: 0; transform: translateY(6px); } }
+
+.table-wrap { overflow-x: auto; }
+#heatmap { border-collapse: collapse; width: 100%; text-align: center; font-variant-numeric: tabular-nums; }
+#heatmap th, #heatmap td { padding: 6px 4px; border: 1px solid var(--border); min-width: 36px; }
+#heatmap th { font-weight: normal; color: var(--muted); font-size: .85rem; }
+#heatmap td.top { outline: 2px solid var(--gold); outline-offset: -2px; font-weight: bold; }
+
+.toplist { margin: 0; padding-left: 0; list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 16px; }
+.toplist li { display: flex; justify-content: space-between; border-bottom: 1px dotted var(--border); padding: 2px 0; }
+.toplist b { font-family: ui-monospace, monospace; font-size: 1.1rem; }
+.toplist span { color: var(--muted); }
+
+.lookup { margin-top: 12px; }
+.lookup ul { margin: 6px 0; padding-left: 20px; }
+
+.disclaimer {
+  font-size: .85rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 8px 16px 32px;
+}
+
+/* ---------- ມືຖື: ຈໍແຄບ ---------- */
+@media (max-width: 600px) {
+  header { padding: 20px 12px 4px; }
+  .sub { font-size: .9rem; }
+  main { padding: 12px; }
+  .card { padding: 14px; border-radius: 12px; margin-bottom: 12px; }
+  .grid2 { gap: 12px; margin-bottom: 12px; }
+
+  /* ຊ່ອງເລືອກ ແລະ ປຸ່ມ ເຕັມຄວາມກວ້າງ ກົດງ່າຍ */
+  .controls { gap: 10px; }
+  .controls label { flex: 1 1 140px; }
+  .controls label:has(select) { flex-basis: 100%; }
+  .controls label select, .controls label input { width: 100%; }
+  .controls button.primary { flex: 1 1 100%; }
+
+  /* ເລກທີ່ສຸ່ມໄດ້: ເລກໃຫຍ່ຢູ່ເທິງ ລາຍລະອຽດຢູ່ລຸ່ມ */
+  .ticket { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 12px; }
+  .ticket .num { font-size: clamp(1.6rem, 9vw, 2rem); letter-spacing: .18em; }
+  .ticket .meta { text-align: left; font-size: .8rem; }
+
+  /* ຕາຕະລາງຄວາມຖີ່ 11 ຖັນ: ບີບໃຫ້ພໍດີຈໍ ບໍ່ຕ້ອງເລື່ອນຂ້າງ (ຂະໜາດຕົວເລກຕາມຄວາມກວ້າງຈໍ) */
+  .table-wrap { overflow-x: hidden; margin: 0 -6px; }
+  #heatmap { table-layout: fixed; width: 100%; font-size: clamp(9px, 3vw, 13px); }
+  #heatmap th, #heatmap td { min-width: 0; padding: 5px 0; overflow: hidden; }
+  #heatmap th:first-child { width: 13%; font-size: clamp(8px, 2.4vw, 11px); line-height: 1.15; word-break: break-word; }
+  #heatmap td.top { outline-width: 1.5px; }
+
+  .toplist { gap: 4px 12px; }
+  .toplist b { font-size: 1rem; }
+}
+
+.donate { text-align: center; }
+.donate img {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  margin: 12px auto;
+  border-radius: 12px;
+  background: #fff;
+}

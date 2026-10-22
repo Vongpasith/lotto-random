@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="lo">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ສຸ່ມຫວຍຈາກສະຖິຕິ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap">
+  <link rel="stylesheet" href="style.css?v=202610221059">
+</head>
+<body>
+  <header>
+    <h1>🎰 ສຸ່ມຫວຍຈາກສະຖິຕິ</h1>
+    <p class="sub">ວິເຄາະຜົນຫວຍ 6 ໂຕ ຍ້ອນຫຼັງ <b id="drawCount">0</b> ງວດ ແລ້ວສຸ່ມເລກໂດຍຖ່ວງນ້ຳໜັກຕາມຄວາມຖີ່</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>ສຸ່ມເລກ</h2>
+      <div class="controls">
+        <label>ວິທີສຸ່ມ
+          <select id="mode">
+            <option value="weighted">ຖ່ວງນ້ຳໜັກຕາມຄວາມຖີ່ (ແນະນຳ)</option>
+            <option value="hot">ເລກຮ້ອນ (ເນັ້ນເລກທີ່ອອກເລື້ອຍ)</option>
+            <option value="cold">ເລກເຢັນ (ເນັ້ນເລກທີ່ບໍ່ຄ່ອຍອອກ)</option>
+            <option value="uniform">ສຸ່ມລ້ວນ (ບໍ່ໃຊ້ສະຖິຕິ)</option>
+          </select>
+        </label>
+        <label>ຈຳນວນຊຸດ
+          <input id="count" type="number" min="1" max="50" value="5">
+        </label>
+        <button id="generate" class="primary">ສຸ່ມເລີຍ</button>
+      </div>
+      <div id="results" class="results"></div>
+    </section>
+
+    <section class="card">
+      <h2>ຄວາມຖີ່ຂອງເລກແຕ່ລະຫຼັກ</h2>
+      <p class="hint">ແຕ່ລະຊ່ອງແມ່ນຈຳນວນຄັ້ງທີ່ເລກນັ້ນອອກໃນຫຼັກນັ້ນ ສີເຂັ້ມ = ອອກເລື້ອຍ</p>
+      <div class="table-wrap"><table id="heatmap"></table></div>
+    </section>
+
+    <section class="grid2">
+      <div class="card">
+        <h2>ເລກທ້າຍ 2 ໂຕ ທີ່ອອກເລື້ອຍ</h2>
+        <ol id="top2" class="toplist"></ol>
+      </div>
+      <div class="card">
+        <h2>ເລກທ້າຍ 3 ໂຕ ທີ່ອອກເລື້ອຍ</h2>
+        <ol id="top3" class="toplist"></ol>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>ຄົ້ນຫາເລກຂອງທ່ານ</h2>
+      <div class="controls">
+        <input id="lookup" inputmode="numeric" maxlength="6" placeholder="ໃສ່ເລກ 2–6 ໂຕ ເຊັ່ນ 45 ຫຼື 123456">
+        <button id="lookupBtn">ກວດ</button>
+      </div>
+      <div id="lookupResult" class="lookup"></div>
+    </section>
+
+    <section class="card">
+      <details>
+        <summary>ແກ້ໄຂຂໍ້ມູນຜົນຫວຍ (ຊົ່ວຄາວໃນໜ້ານີ້)</summary>
+        <p class="hint">ວາງເລກ 6 ໂຕ ແຖວລະງວດ ແລ້ວກົດ "ຄຳນວນໃໝ່" — ຖ້າຢາກບັນທຶກຖາວອນ ໃຫ້ແກ້ໄຟລ໌ <code>lotto_result</code> ແລ້ວແລ່ນ <code>./update-data.sh</code></p>
+        <textarea id="dataInput" rows="8"></textarea>
+        <button id="reload">ຄຳນວນໃໝ່</button>
+        <span id="dataMsg" class="hint"></span>
+      </details>
+    </section>
+
+    <section class="card donate">
+      <h2>☕ ສະໜັບສະໜູນຜູ້ພັດທະນາ</h2>
+      <p class="hint">ຖ້າມັກເວັບນີ້ ສາມາດ Donate ໄດ້ຜ່ານ LAO QR — ສະແກນດ້ວຍແອັບທະນາຄານໃດກໍໄດ້ທີ່ຮອງຮັບ LAPNet</p>
+      <img src="img/donate-qr.png" alt="QR Donate - VONGPASITH SONEPHUN (BCEL, LAK)" width="384" height="511" loading="lazy">
+      <p class="hint">ຂອບໃຈຫຼາຍໆ 🙏</p>
+    </section>
+
+    <p class="disclaimer">
+      ⚠️ ຫວຍແຕ່ລະງວດສຸ່ມແຍກກັນ ທຸກເລກມີໂອກາດຖືກ 6 ໂຕ ເທົ່າກັນຄື 1 ໃນ 1,000,000
+      ສະຖິຕິໃນໜ້ານີ້ບອກໄດ້ພຽງແຕ່ວ່າ "ອະດີດ" ອອກຫຍັງເລື້ອຍ ບໍ່ໄດ້ເຮັດໃຫ້ໂອກາດຖືກງວດໜ້າສູງຂຶ້ນ — ໃຊ້ເພື່ອຄວາມມ່ວນເທົ່ານັ້ນ
+    </p>
+  </main>
+
+  <script src="data.js?v=202610221059"></script>
+  <script src="app.js?v=202610221059"></script>
+</body>
+</html>
