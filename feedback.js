@@ -46,13 +46,13 @@
     const status = $("fbStatus");
     const message = $("fbMessage").value.trim();
     if (message.length < 2) {
-      status.textContent = "ກະລຸນາຂຽນຂໍ້ຄວາມກ່ອນ";
+      status.textContent = I18N.t("fbEmpty");
       $("fbMessage").focus();
       return;
     }
     const btn = form.querySelector("button[type=submit]");
     btn.disabled = true;
-    status.textContent = "ກຳລັງສົ່ງ...";
+    status.textContent = I18N.t("fbSending");
     try {
       const res = await post("/feedback", {
         message,
@@ -61,13 +61,13 @@
         website: $("fbWebsite").value,
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "ສົ່ງບໍ່ສຳເລັດ");
+      if (!res.ok) throw new Error(data.error || I18N.t("fbFail"));
       form.reset();
       rating = null;
       paintStars();
-      status.textContent = "ຂອບໃຈສຳລັບຄຳແນະນຳ 🙏";
+      status.textContent = I18N.t("fbThanks");
     } catch (err) {
-      status.textContent = err.message === "Failed to fetch" ? "ເຊື່ອມຕໍ່ບໍ່ໄດ້ ລອງໃໝ່ອີກຄັ້ງ" : err.message;
+      status.textContent = err instanceof TypeError ? I18N.t("fbOffline") : err.message;
     } finally {
       btn.disabled = false;
     }

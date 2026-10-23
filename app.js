@@ -1,7 +1,9 @@
 // ສຸ່ມຫວຍ 2–6 ໂຕ ຈາກສະຖິຕິຜົນຫວຍ 6 ໂຕ ຍ້ອນຫຼັງ
 (() => {
   const $ = (id) => document.getElementById(id);
+  const { t, formatDate } = window.I18N;
   let stats = null;
+  let lastRows = null; // ເລກທີ່ສຸ່ມໄດ້ຫຼ້າສຸດ (ໄວ້ render ໃໝ່ຕອນປ່ຽນພາສາ)
 
   // ນັບຄວາມຖີ່: ເລກແຕ່ລະຫຼັກ, ເລກທ້າຍ 2 ໂຕ, ເລກທ້າຍ 3 ໂຕ
   function computeStats(results) {
@@ -79,30 +81,33 @@
       seen.add(num);
       rows.push(num);
     }
-    $("results").innerHTML = rows.map((num) => {
-      const score = statScore(num);
-      if (len < 6) {
+    lastRows = rows;
+    renderRows();
+  }
+
+  function renderRows() {
+    if (!lastRows) return;
+    $("results").innerHTML = lastRows.map((num) => {
+      const score = t("score", { s: statScore(num).toFixed(2) });
+      let meta;
+      if (num.length < 6) {
         const hits = endingWith(num);
-        const last = hits[0] ? ` · ຫຼ້າສຸດ ${formatDate(hits[0].date) || hits[0].num}` : "";
-        return `<div class="ticket">
-        <span class="num">${num}</span>
-        <span class="meta">ຄະແນນສະຖິຕິ ${score.toFixed(2)}x<br>
-        ເລກທ້າຍ ${len} ໂຕ "${num}" ເຄີຍອອກ ${hits.length} ຄັ້ງ${last}</span>
-      </div>`;
+        const last = hits[0] ? t("latestOn", { d: formatDate(hits[0].date) || hits[0].num }) : "";
+        meta = t("endingHits", { len: num.length, num, c: hits.length }) + last;
+      } else {
+        const a = num.slice(-2), b = num.slice(-3);
+        meta = t("sixMeta", { a, b, c2: stats.last2.get(a) || 0, c3: stats.last3.get(b) || 0 }) +
+          (stats.results.includes(num) ? t("pastSix") : "");
       }
-      const c2 = stats.last2.get(num.slice(-2)) || 0;
-      const c3 = stats.last3.get(num.slice(-3)) || 0;
-      const past = stats.results.includes(num) ? " · ⚠️ ເຄີຍອອກ 6 ໂຕ ແລ້ວ" : "";
       return `<div class="ticket">
         <span class="num">${num}</span>
-        <span class="meta">ຄະແນນສະຖິຕິ ${score.toFixed(2)}x<br>
-        ທ້າຍ 2 ໂຕ "${num.slice(-2)}" ເຄີຍອອກ ${c2} ຄັ້ງ · ທ້າຍ 3 ໂຕ "${num.slice(-3)}" ເຄີຍອອກ ${c3} ຄັ້ງ${past}</span>
+        <span class="meta">${score}<br>${meta}</span>
       </div>`;
     }).join("");
   }
 
   function renderHeatmap() {
-    const labels = ["ຫຼັກແສນ", "ຫຼັກໝື່ນ", "ຫຼັກພັນ", "ຫຼັກຮ້ອຍ", "ຫຼັກສິບ", "ຫຼັກໜ່ວຍ"];
+    const labels = t("positions");
     let max = 0;
     for (const row of stats.pos) max = Math.max(max, ...row);
     let html = "<tr><th></th>" + [...Array(10).keys()].map((d) => `<th>${d}</th>`).join("") + "</tr>";
@@ -119,58 +124,48 @@
 
   function renderTop(map, el, limit) {
     const items = [...map.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, limit);
-    $(el).innerHTML = items.map(([k, v]) => `<li><b>${k}</b><span>${v} ຄັ້ງ</span></li>`).join("");
+    $(el).innerHTML = items.map(([k, v]) => `<li><b>${k}</b><span>${t("times", { c: v })}</span></li>`).join("");
   }
 
   function renderLookup() {
     const q = $("lookup").value.trim();
     const box = $("lookupResult");
     if (!/^\d{2,6}$/.test(q)) {
-      box.textContent = "ກະລຸນາໃສ່ຕົວເລກ 2–6 ໂຕ";
+      box.textContent = t("lookupBad");
       return;
     }
     // ທຽບກັບເລກທ້າຍຂອງຜົນຫວຍທີ່ຜ່ານມາ
     const hits = endingWith(q);
-    let html = `ເລກທ້າຍ <b>${q}</b> ເຄີຍອອກ <b>${hits.length}</b> ຄັ້ງ ຈາກ ${stats.n} ງວດ`;
-    if (q.length <= 3) {
-      const expected = stats.n / 10 ** q.length;
-      html += ` (ຄ່າສະເລ່ຍຖ້າສຸ່ມລ້ວນ ≈ ${expected.toFixed(2)} ຄັ້ງ)`;
-    }
+    let html = t("lookupHits", { q, c: hits.length, n: stats.n });
+    if (q.length <= 3) html += t("lookupExpected", { e: (stats.n / 10 ** q.length).toFixed(2) });
     if (hits.length) {
       html += `<ul>${hits.slice(0, 20).map((h) =>
         `<li>${h.num}${h.date ? ` <span class="hint">— ${formatDate(h.date)}</span>` : ""}</li>`).join("")}</ul>`;
     }
-    html += `ຄະແນນສະຖິຕິຂອງເລກນີ້: <b>${statScore(q).toFixed(2)}x</b>`;
+    html += t("lookupScore", { s: statScore(q).toFixed(2) });
     box.innerHTML = html;
   }
 
   function load(results) {
     stats = computeStats(results);
-    $("drawCount").textContent = stats.n;
+    renderSub();
     renderHeatmap();
     renderTop(stats.last2, "top2", 10);
     renderTop(stats.last3, "top3", 10);
     $("results").innerHTML = "";
   }
 
+  function renderSub() {
+    $("sub").innerHTML = t("sub", { n: stats.n });
+  }
+
   // ---------- ຜົນຫວຍແຕ່ລະງວດ ----------
-  const DAYS = ["ອາທິດ", "ຈັນ", "ອັງຄານ", "ພຸດ", "ພະຫັດ", "ສຸກ", "ເສົາ"];
-  const MONTHS = ["ມັງກອນ", "ກຸມພາ", "ມີນາ", "ເມສາ", "ພຶດສະພາ", "ມິຖຸນາ",
-    "ກໍລະກົດ", "ສິງຫາ", "ກັນຍາ", "ຕຸລາ", "ພະຈິກ", "ທັນວາ"];
   const HISTORY_STEP = 20;
   let historyShown = 0;
 
-  // "2026-10-21" → "ວັນພຸດ 21 ຕຸລາ 2026"
-  function formatDate(iso) {
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
-    if (!m) return "";
-    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
-    return `ວັນ${DAYS[d.getUTCDay()]} ${+m[3]} ${MONTHS[+m[2] - 1]} ${m[1]}`;
-  }
-
   function drawRow(num, date, latest) {
     return `<tr${latest ? ' class="latest"' : ""}>
-      <td class="date">${formatDate(date) || "—"}${latest ? ' <span class="badge">ລ່າສຸດ</span>' : ""}</td>
+      <td class="date">${formatDate(date) || "—"}${latest ? ` <span class="badge">${t("latest")}</span>` : ""}</td>
       <td class="n6">${num}</td>
       <td>${num.slice(-4)}</td>
       <td>${num.slice(-3)}</td>
@@ -178,9 +173,10 @@
     </tr>`;
   }
 
+  // more: true = ເພີ່ມອີກ 20 ງວດ, false = ເລີ່ມໃໝ່, "keep" = ຈຳນວນເທົ່າເກົ່າ (ຕອນປ່ຽນພາສາ)
   function renderHistory(more) {
     const total = stats.results.length;
-    historyShown = more ? Math.min(total, historyShown + HISTORY_STEP) : Math.min(total, HISTORY_STEP);
+    if (more !== "keep") historyShown = more ? Math.min(total, historyShown + HISTORY_STEP) : Math.min(total, HISTORY_STEP);
     let rows = "";
     for (let k = 0; k < historyShown; k++) {
       const i = total - 1 - k; // ງວດໃໝ່ຢູ່ເທິງ
@@ -188,7 +184,7 @@
     }
     $("historyBody").innerHTML = rows;
     $("historyMore").hidden = historyShown >= total;
-    $("historyInfo").textContent = `ສະແດງ ${historyShown} ຈາກ ${total} ງວດ`;
+    $("historyInfo").textContent = t("showing", { a: historyShown, b: total });
   }
 
   // ເລີ່ມຕົ້ນ
@@ -201,4 +197,15 @@
   $("generate").addEventListener("click", renderGenerated);
   $("lookupBtn").addEventListener("click", renderLookup);
   $("lookup").addEventListener("keydown", (e) => { if (e.key === "Enter") renderLookup(); });
+
+  // ປ່ຽນພາສາ → render ສ່ວນທີ່ສ້າງດ້ວຍ JS ໃໝ່ (ເລກທີ່ສຸ່ມໄດ້ ຍັງເປັນເລກເດີມ)
+  document.addEventListener("langchange", () => {
+    renderSub();
+    renderHeatmap();
+    renderTop(stats.last2, "top2", 10);
+    renderTop(stats.last3, "top3", 10);
+    renderHistory("keep");
+    renderRows();
+    if ($("lookupResult").innerHTML) renderLookup();
+  });
 })();

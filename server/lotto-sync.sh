@@ -7,6 +7,6 @@ old=$(git rev-parse HEAD)
 git fetch -q origin main
 git reset -q --hard origin/main
 # ສະເພາະໄຟລ໌ໜ້າເວັບ (ບໍ່ເອົາ server/, scripts/, .git ອອກໄປເວັບ)
-rsync -a --delete-after --chmod=Da+rx,Fa+r index.html app.js data.js feedback.js w.js style.css img admin /var/www/lotto-random/
+rsync -a --delete-after --chmod=Da+rx,Fa+r index.html app.js data.js i18n.js feedback.js w.js style.css img admin /var/www/lotto-random/
 # backend ປ່ຽນ → restart (ໂຄ້ດ backend ແລ່ນຈາກ /opt/lotto-random-src/server ໂດຍກົງ)
 if ! git diff --quiet "$old" HEAD -- server/server.mjs; then systemctl restart lotto-api; fi

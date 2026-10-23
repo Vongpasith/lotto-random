@@ -17,113 +17,114 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap">
-  <link rel="stylesheet" href="style.css?v=202610221300">
+  <link rel="stylesheet" href="style.css?v=202610231100">
 </head>
 <body>
   <header>
-    <h1>🎰 ສຸ່ມຫວຍຈາກສະຖິຕິ</h1>
-    <p class="sub">ວິເຄາະຜົນຫວຍ 6 ໂຕ ຍ້ອນຫຼັງ <b id="drawCount">0</b> ງວດ ແລ້ວສຸ່ມເລກໂດຍຖ່ວງນ້ຳໜັກຕາມຄວາມຖີ່</p>
+    <button id="langBtn" class="lang-btn" type="button">EN</button>
+    <h1 data-i18n="h1">🎰 ສຸ່ມຫວຍຈາກສະຖິຕິ</h1>
+    <p class="sub" id="sub">ວິເຄາະຜົນຫວຍ 6 ໂຕ ຍ້ອນຫຼັງ <b id="drawCount">0</b> ງວດ ແລ້ວສຸ່ມເລກໂດຍຖ່ວງນ້ຳໜັກຕາມຄວາມຖີ່</p>
   </header>
 
   <main>
     <section class="card">
-      <h2>ສຸ່ມເລກ</h2>
+      <h2 data-i18n="genTitle">ສຸ່ມເລກ</h2>
       <div class="controls">
-        <label>ວິທີສຸ່ມ
+        <label><span data-i18n="mode">ວິທີສຸ່ມ</span>
           <select id="mode">
-            <option value="weighted">ຖ່ວງນ້ຳໜັກຕາມຄວາມຖີ່ (ແນະນຳ)</option>
-            <option value="hot">ເລກຮ້ອນ (ເນັ້ນເລກທີ່ອອກເລື້ອຍ)</option>
-            <option value="cold">ເລກເຢັນ (ເນັ້ນເລກທີ່ບໍ່ຄ່ອຍອອກ)</option>
-            <option value="uniform">ສຸ່ມລ້ວນ (ບໍ່ໃຊ້ສະຖິຕິ)</option>
+            <option value="weighted" data-i18n="modeWeighted">ຖ່ວງນ້ຳໜັກຕາມຄວາມຖີ່ (ແນະນຳ)</option>
+            <option value="hot" data-i18n="modeHot">ເລກຮ້ອນ (ເນັ້ນເລກທີ່ອອກເລື້ອຍ)</option>
+            <option value="cold" data-i18n="modeCold">ເລກເຢັນ (ເນັ້ນເລກທີ່ບໍ່ຄ່ອຍອອກ)</option>
+            <option value="uniform" data-i18n="modeUniform">ສຸ່ມລ້ວນ (ບໍ່ໃຊ້ສະຖິຕິ)</option>
           </select>
         </label>
-        <label>ຈຳນວນໂຕ
+        <label><span data-i18n="digits">ຈຳນວນໂຕ</span>
           <select id="digits">
-            <option value="2">2 ໂຕ</option>
-            <option value="3">3 ໂຕ</option>
-            <option value="4">4 ໂຕ</option>
-            <option value="5">5 ໂຕ</option>
-            <option value="6" selected>6 ໂຕ</option>
+            <option value="2" data-i18n-digits="2">2 ໂຕ</option>
+            <option value="3" data-i18n-digits="3">3 ໂຕ</option>
+            <option value="4" data-i18n-digits="4">4 ໂຕ</option>
+            <option value="5" data-i18n-digits="5">5 ໂຕ</option>
+            <option value="6" data-i18n-digits="6" selected>6 ໂຕ</option>
           </select>
         </label>
-        <label>ຈຳນວນຊຸດ
+        <label><span data-i18n="count">ຈຳນວນຊຸດ</span>
           <input id="count" type="number" min="1" max="50" value="5">
         </label>
-        <button id="generate" class="primary">ສຸ່ມເລີຍ</button>
+        <button id="generate" class="primary" data-i18n="generate">ສຸ່ມເລີຍ</button>
       </div>
       <div id="results" class="results"></div>
     </section>
 
     <section class="card">
-      <h2>ຜົນຫວຍແຕ່ລະງວດ</h2>
+      <h2 data-i18n="historyTitle">ຜົນຫວຍແຕ່ລະງວດ</h2>
       <div class="table-wrap">
         <table class="history">
           <thead>
-            <tr><th>ງວດວັນທີ</th><th>6 ໂຕ</th><th>4 ໂຕ</th><th>3 ໂຕ</th><th>2 ໂຕ</th></tr>
+            <tr><th data-i18n="drawDate">ງວດວັນທີ</th><th data-i18n-digits="6">6 ໂຕ</th><th data-i18n-digits="4">4 ໂຕ</th><th data-i18n-digits="3">3 ໂຕ</th><th data-i18n-digits="2">2 ໂຕ</th></tr>
           </thead>
           <tbody id="historyBody"></tbody>
         </table>
       </div>
       <div class="history-foot">
         <span id="historyInfo" class="hint"></span>
-        <button id="historyMore">ເບິ່ງເພີ່ມ</button>
+        <button id="historyMore" data-i18n="showMore">ເບິ່ງເພີ່ມ</button>
       </div>
     </section>
 
     <section class="card">
-      <h2>ຄວາມຖີ່ຂອງເລກແຕ່ລະຫຼັກ</h2>
-      <p class="hint">ແຕ່ລະຊ່ອງແມ່ນຈຳນວນຄັ້ງທີ່ເລກນັ້ນອອກໃນຫຼັກນັ້ນ ສີເຂັ້ມ = ອອກເລື້ອຍ</p>
+      <h2 data-i18n="heatTitle">ຄວາມຖີ່ຂອງເລກແຕ່ລະຫຼັກ</h2>
+      <p class="hint" data-i18n="heatHint">ແຕ່ລະຊ່ອງແມ່ນຈຳນວນຄັ້ງທີ່ເລກນັ້ນອອກໃນຫຼັກນັ້ນ ສີເຂັ້ມ = ອອກເລື້ອຍ</p>
       <div class="table-wrap"><table id="heatmap"></table></div>
     </section>
 
     <section class="grid2">
       <div class="card">
-        <h2>ເລກທ້າຍ 2 ໂຕ ທີ່ອອກເລື້ອຍ</h2>
+        <h2 data-i18n="top2">ເລກທ້າຍ 2 ໂຕ ທີ່ອອກເລື້ອຍ</h2>
         <ol id="top2" class="toplist"></ol>
       </div>
       <div class="card">
-        <h2>ເລກທ້າຍ 3 ໂຕ ທີ່ອອກເລື້ອຍ</h2>
+        <h2 data-i18n="top3">ເລກທ້າຍ 3 ໂຕ ທີ່ອອກເລື້ອຍ</h2>
         <ol id="top3" class="toplist"></ol>
       </div>
     </section>
 
     <section class="card">
-      <h2>ຄົ້ນຫາເລກຂອງທ່ານ</h2>
+      <h2 data-i18n="lookupTitle">ຄົ້ນຫາເລກຂອງທ່ານ</h2>
       <div class="controls">
-        <input id="lookup" inputmode="numeric" maxlength="6" placeholder="ໃສ່ເລກ 2–6 ໂຕ ເຊັ່ນ 45 ຫຼື 123456">
-        <button id="lookupBtn">ກວດ</button>
+        <input id="lookup" inputmode="numeric" maxlength="6" data-i18n-ph="lookupPh" placeholder="ໃສ່ເລກ 2–6 ໂຕ ເຊັ່ນ 45 ຫຼື 123456">
+        <button id="lookupBtn" data-i18n="lookupBtn">ກວດ</button>
       </div>
       <div id="lookupResult" class="lookup"></div>
     </section>
 
     <section class="card">
-      <h2>💬 ແນະນຳ / ຕິຊົມ</h2>
-      <p class="hint">ມີຫຍັງຢາກໃຫ້ປັບປຸງ ຫຼື ພົບບັນຫາ ບອກໄດ້ເລີຍ</p>
+      <h2 data-i18n="fbTitle">💬 ແນະນຳ / ຕິຊົມ</h2>
+      <p class="hint" data-i18n="fbHint">ມີຫຍັງຢາກໃຫ້ປັບປຸງ ຫຼື ພົບບັນຫາ ບອກໄດ້ເລີຍ</p>
       <form id="feedbackForm" class="feedback" novalidate>
-        <div class="stars" role="radiogroup" aria-label="ໃຫ້ຄະແນນ">
-          <button type="button" data-v="1" aria-label="1 ດາວ">★</button>
-          <button type="button" data-v="2" aria-label="2 ດາວ">★</button>
-          <button type="button" data-v="3" aria-label="3 ດາວ">★</button>
-          <button type="button" data-v="4" aria-label="4 ດາວ">★</button>
-          <button type="button" data-v="5" aria-label="5 ດາວ">★</button>
+        <div class="stars" role="radiogroup" aria-label="ໃຫ້ຄະແນນ" data-i18n-label="fbRating">
+          <button type="button" data-v="1" data-i18n-stars="1" aria-label="1 ດາວ">★</button>
+          <button type="button" data-v="2" data-i18n-stars="2" aria-label="2 ດາວ">★</button>
+          <button type="button" data-v="3" data-i18n-stars="3" aria-label="3 ດາວ">★</button>
+          <button type="button" data-v="4" data-i18n-stars="4" aria-label="4 ດາວ">★</button>
+          <button type="button" data-v="5" data-i18n-stars="5" aria-label="5 ດາວ">★</button>
         </div>
-        <textarea id="fbMessage" rows="4" maxlength="2000" placeholder="ຂຽນຂໍ້ຄວາມທີ່ນີ້..." required></textarea>
-        <input id="fbContact" maxlength="200" placeholder="ຊ່ອງທາງຕິດຕໍ່ກັບ (ບໍ່ໃສ່ກໍໄດ້) ເຊັ່ນ ເບີ WhatsApp">
+        <textarea id="fbMessage" rows="4" maxlength="2000" data-i18n-ph="fbMessagePh" placeholder="ຂຽນຂໍ້ຄວາມທີ່ນີ້..." required></textarea>
+        <input id="fbContact" maxlength="200" data-i18n-ph="fbContactPh" placeholder="ຊ່ອງທາງຕິດຕໍ່ກັບ (ບໍ່ໃສ່ກໍໄດ້) ເຊັ່ນ ເບີ WhatsApp">
         <!-- ກັບດັກ bot: ຄົນບໍ່ເຫັນຊ່ອງນີ້ -->
         <input name="website" id="fbWebsite" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
-        <button type="submit" class="primary">ສົ່ງ</button>
+        <button type="submit" class="primary" data-i18n="fbSend">ສົ່ງ</button>
         <span id="fbStatus" class="hint" role="status"></span>
       </form>
     </section>
 
     <section class="card donate">
-      <h2>☕ ສະໜັບສະໜູນຜູ້ພັດທະນາ</h2>
-      <p class="hint">ຖ້າມັກເວັບນີ້ ສາມາດ Donate ໄດ້ຜ່ານ LAO QR — ສະແກນດ້ວຍແອັບທະນາຄານໃດກໍໄດ້ທີ່ຮອງຮັບ LAPNet</p>
+      <h2 data-i18n="donateTitle">☕ ສະໜັບສະໜູນຜູ້ພັດທະນາ</h2>
+      <p class="hint" data-i18n="donateHint">ຖ້າມັກເວັບນີ້ ສາມາດ Donate ໄດ້ຜ່ານ LAO QR — ສະແກນດ້ວຍແອັບທະນາຄານໃດກໍໄດ້ທີ່ຮອງຮັບ LAPNet</p>
       <img src="img/donate-qr.png" alt="QR Donate - VONGPASITH SONEPHUN (BCEL, LAK)" width="384" height="511" loading="lazy">
-      <p class="hint">ຂອບໃຈຫຼາຍໆ 🙏</p>
+      <p class="hint" data-i18n="thanks">ຂອບໃຈຫຼາຍໆ 🙏</p>
     </section>
 
-    <p class="disclaimer">
+    <p class="disclaimer" data-i18n-html="disclaimer">
       ⚠️ ຫວຍແຕ່ລະງວດສຸ່ມແຍກກັນ ທຸກເລກມີໂອກາດຖືກ 6 ໂຕ ເທົ່າກັນຄື 1 ໃນ 1,000,000
       ສະຖິຕິໃນໜ້ານີ້ບອກໄດ້ພຽງແຕ່ວ່າ "ອະດີດ" ອອກຫຍັງເລື້ອຍ ບໍ່ໄດ້ເຮັດໃຫ້ໂອກາດຖືກງວດໜ້າສູງຂຶ້ນ — ໃຊ້ເພື່ອຄວາມມ່ວນເທົ່ານັ້ນ
       <br>ເວັບນີ້ນັບຈຳນວນຄົນເຂົ້າແບບບໍ່ລະບຸຕົວຕົນ (ບໍ່ເກັບ IP ຫຼື ຂໍ້ມູນສ່ວນຕົວ)
@@ -131,7 +132,8 @@
   </main>
 
   <script src="data.js?v=202610221300"></script>
-  <script src="app.js?v=202610231000"></script>
-  <script src="feedback.js?v=202610221700"></script>
+  <script src="i18n.js?v=202610231100"></script>
+  <script src="app.js?v=202610231100"></script>
+  <script src="feedback.js?v=202610231100"></script>
 </body>
 </html>
