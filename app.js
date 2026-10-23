@@ -1,4 +1,4 @@
-// ສຸ່ມຫວຍຈາກສະຖິຕິຜົນຫວຍ 6 ໂຕ ຍ້ອນຫຼັງ
+// ສຸ່ມຫວຍ 2–6 ໂຕ ຈາກສະຖິຕິຜົນຫວຍ 6 ໂຕ ຍ້ອນຫຼັງ
 (() => {
   const $ = (id) => document.getElementById(id);
   let stats = null;
@@ -43,32 +43,53 @@
     return 9;
   }
 
-  function generate(mode) {
+  // ສຸ່ມເລກ len ໂຕ (2–6) = ເລກທ້າຍ len ໂຕ ຂອງຫວຍ 6 ໂຕ ຈຶ່ງໃຊ້ສະຖິຕິຂອງຫຼັກທ້າຍໆ
+  function generate(mode, len = 6) {
     let num = "";
-    for (let i = 0; i < 6; i++) num += pickWeighted(weightsFor(mode, i));
+    for (let i = 6 - len; i < 6; i++) num += pickWeighted(weightsFor(mode, i));
     return num;
   }
 
   // ຄະແນນສະຖິຕິ = ຄວາມເປັນໄປໄດ້ຕາມສະຖິຕິ ທຽບກັບການສຸ່ມລ້ວນ (1.00x = ເທົ່າຄ່າສະເລ່ຍ)
+  // ເລກທີ່ສັ້ນກວ່າ 6 ໂຕ ທຽບກັບຫຼັກທ້າຍ
   function statScore(num) {
     let s = 1;
-    for (let i = 0; i < 6; i++) s *= stats.prob[i][+num[i]] * 10;
+    const start = 6 - num.length;
+    for (let k = 0; k < num.length; k++) s *= stats.prob[start + k][+num[k]] * 10;
     return s;
+  }
+
+  // ຜົນຫວຍທີ່ລົງທ້າຍດ້ວຍເລກນີ້ (ງວດໃໝ່ກ່ອນ)
+  function endingWith(q) {
+    const hits = [];
+    stats.results.forEach((r, i) => { if (r.endsWith(q)) hits.push({ num: r, date: dates[i] }); });
+    return hits.reverse();
   }
 
   function renderGenerated() {
     const mode = $("mode").value;
-    const count = Math.min(50, Math.max(1, parseInt($("count").value, 10) || 1));
+    const len = Math.min(6, Math.max(2, parseInt($("digits").value, 10) || 6));
+    // ເລກ 2 ໂຕ ມີພຽງ 100 ແບບ ຈຶ່ງຈຳກັດບໍ່ໃຫ້ຂໍເກີນຈຳນວນທີ່ສຸ່ມໄດ້
+    const count = Math.min(50, 10 ** len, Math.max(1, parseInt($("count").value, 10) || 1));
     const seen = new Set();
     const rows = [];
     for (let tries = 0; rows.length < count && tries < count * 20; tries++) {
-      const num = generate(mode);
+      const num = generate(mode, len);
       if (seen.has(num)) continue;
       seen.add(num);
       rows.push(num);
     }
     $("results").innerHTML = rows.map((num) => {
       const score = statScore(num);
+      if (len < 6) {
+        const hits = endingWith(num);
+        const last = hits[0] ? ` · ຫຼ້າສຸດ ${formatDate(hits[0].date) || hits[0].num}` : "";
+        return `<div class="ticket">
+        <span class="num">${num}</span>
+        <span class="meta">ຄະແນນສະຖິຕິ ${score.toFixed(2)}x<br>
+        ເລກທ້າຍ ${len} ໂຕ "${num}" ເຄີຍອອກ ${hits.length} ຄັ້ງ${last}</span>
+      </div>`;
+      }
       const c2 = stats.last2.get(num.slice(-2)) || 0;
       const c3 = stats.last3.get(num.slice(-3)) || 0;
       const past = stats.results.includes(num) ? " · ⚠️ ເຄີຍອອກ 6 ໂຕ ແລ້ວ" : "";
@@ -109,9 +130,7 @@
       return;
     }
     // ທຽບກັບເລກທ້າຍຂອງຜົນຫວຍທີ່ຜ່ານມາ
-    const hits = [];
-    stats.results.forEach((r, i) => { if (r.endsWith(q)) hits.push({ num: r, date: dates[i] }); });
-    hits.reverse(); // ງວດໃໝ່ກ່ອນ
+    const hits = endingWith(q);
     let html = `ເລກທ້າຍ <b>${q}</b> ເຄີຍອອກ <b>${hits.length}</b> ຄັ້ງ ຈາກ ${stats.n} ງວດ`;
     if (q.length <= 3) {
       const expected = stats.n / 10 ** q.length;
@@ -121,7 +140,7 @@
       html += `<ul>${hits.slice(0, 20).map((h) =>
         `<li>${h.num}${h.date ? ` <span class="hint">— ${formatDate(h.date)}</span>` : ""}</li>`).join("")}</ul>`;
     }
-    if (q.length === 6) html += `ຄະແນນສະຖິຕິຂອງເລກນີ້: <b>${statScore(q).toFixed(2)}x</b>`;
+    html += `ຄະແນນສະຖິຕິຂອງເລກນີ້: <b>${statScore(q).toFixed(2)}x</b>`;
     box.innerHTML = html;
   }
 
