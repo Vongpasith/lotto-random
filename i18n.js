@@ -4,8 +4,6 @@
 (() => {
   const DICT = {
     lo: {
-      switchTo: "EN",
-      switchLabel: "Switch to English",
       title: "ສຸ່ມຫວຍຈາກສະຖິຕິ",
       h1: "🎰 ສຸ່ມຫວຍຈາກສະຖິຕິ",
       sub: "ວິເຄາະຜົນຫວຍ 6 ໂຕ ຍ້ອນຫຼັງ <b>{n}</b> ງວດ ແລ້ວສຸ່ມເລກໂດຍຖ່ວງນ້ຳໜັກຕາມຄວາມຖີ່",
@@ -63,8 +61,6 @@
       date: "ວັນ{day} {d} {month} {y}",
     },
     en: {
-      switchTo: "ລາວ",
-      switchLabel: "ປ່ຽນເປັນພາສາລາວ",
       title: "Lao Lottery Number Picker",
       h1: "🎰 Lao Lottery Number Picker",
       sub: "Analyses the last <b>{n}</b> Lao lottery draws (6 digits) and picks numbers weighted by how often each digit came up",
@@ -152,8 +148,11 @@
     for (const el of document.querySelectorAll("[data-i18n-label]")) el.setAttribute("aria-label", t(el.dataset.i18nLabel));
     for (const el of document.querySelectorAll("[data-i18n-digits]")) el.textContent = t("nDigits", { n: el.dataset.i18nDigits });
     for (const el of document.querySelectorAll("[data-i18n-stars]")) el.setAttribute("aria-label", t("nStars", { n: el.dataset.i18nStars }));
-    const btn = document.getElementById("langBtn");
-    if (btn) { btn.textContent = t("switchTo"); btn.setAttribute("aria-label", t("switchLabel")); }
+    for (const b of document.querySelectorAll(".lang-switch button")) {
+      const on = b.dataset.lang === lang;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", String(on));
+    }
   }
 
   function setLang(l) {
@@ -168,5 +167,5 @@
 
   window.I18N = { t, formatDate, setLang, get lang() { return lang; } };
   apply();
-  document.getElementById("langBtn")?.addEventListener("click", () => setLang(lang === "lo" ? "en" : "lo"));
+  for (const b of document.querySelectorAll(".lang-switch button")) b.addEventListener("click", () => setLang(b.dataset.lang));
 })();

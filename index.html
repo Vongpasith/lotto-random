@@ -17,11 +17,15 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap">
-  <link rel="stylesheet" href="style.css?v=202610231100">
+  <link rel="stylesheet" href="style.css?v=202610231200">
 </head>
 <body>
   <header>
-    <button id="langBtn" class="lang-btn" type="button">EN</button>
+    <div class="lang-switch" role="group" aria-label="ພາສາ / Language">
+      <span aria-hidden="true">🌐</span>
+      <button type="button" data-lang="lo" lang="lo">ລາວ</button>
+      <button type="button" data-lang="en" lang="en">English</button>
+    </div>
     <h1 data-i18n="h1">🎰 ສຸ່ມຫວຍຈາກສະຖິຕິ</h1>
     <p class="sub" id="sub">ວິເຄາະຜົນຫວຍ 6 ໂຕ ຍ້ອນຫຼັງ <b id="drawCount">0</b> ງວດ ແລ້ວສຸ່ມເລກໂດຍຖ່ວງນ້ຳໜັກຕາມຄວາມຖີ່</p>
   </header>
@@ -132,7 +136,7 @@
   </main>
 
   <script src="data.js?v=202610221300"></script>
-  <script src="i18n.js?v=202610231100"></script>
+  <script src="i18n.js?v=202610231200"></script>
   <script src="app.js?v=202610231100"></script>
   <script src="feedback.js?v=202610231100"></script>
 </body>
