@@ -5,7 +5,7 @@
   const MONTHS = ["ມ.ກ.", "ກ.ພ.", "ມ.ນ.", "ມ.ສ.", "ພ.ພ.", "ມິ.ຖ.", "ກ.ລ.", "ສ.ຫ.", "ກ.ຍ.", "ຕ.ລ.", "ພ.ຈ.", "ທ.ວ."];
   const DEVICE_NAMES = { mobile: "📱 ມືຖື", desktop: "💻 ຄອມ", tablet: "📟 ແທັບເລັດ" };
   // ຊື່ເວັບທີ່ສະແດງ (ລະຫັດເວັບມາຈາກ SITES ຂອງ server) — ເວັບທີ່ບໍ່ຢູ່ນີ້ຈະສະແດງເປັນລະຫັດ
-  const SITE_NAMES = { lotto: "🎲 ສຸ່ມຫວຍ", fakhan: "🛍️ ຝາກຮ້ານ", hangan: "💸 HanGan", emenu: "🍽️ E-Menu" };
+  const SITE_NAMES = { lotto: "🎲 ສຸ່ມຫວຍ", fakhan: "🛍️ ຝາກຮ້ານ", hangan: "💸 HanGan", emenu: "🍽️ E-Menu", loykathong: "🪷 ລອຍກະທົງ", room: "🛋️ ລອງຈັດຫ້ອງ" };
   const EVENT_NAMES = { generate: "ສຸ່ມ" };
   const siteName = (id) => SITE_NAMES[id] || id;
   let feedbackItems = [];
