@@ -1,0 +1,30 @@
+# admin กลาง (สถิติคนเข้า + feedback ของทุกเว็บ) ที่ vongpasith.site/admin/
+# ไฟล์หน้าเว็บใช้ชุดเดียวกับ lotto-random (/var/www/lotto-random/admin + style.css), API → lotto-api (พอร์ต 3011)
+vongpasith.site {
+	encode zstd gzip
+	root * /var/www/lotto-random
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+		X-Frame-Options DENY
+		X-Robots-Tag "noindex, nofollow"
+	}
+	@html path /admin/ /admin/index.html
+	header @html Cache-Control "no-cache"
+	handle /api/admin/* {
+		reverse_proxy 127.0.0.1:3011 {
+			header_up X-Forwarded-For {client_ip}
+		}
+	}
+	@files path /admin/* /style.css
+	handle @files {
+		file_server
+	}
+	handle {
+		redir * /admin/ 302
+	}
+}
+
+www.vongpasith.site {
+	redir https://vongpasith.site{uri} permanent
+}

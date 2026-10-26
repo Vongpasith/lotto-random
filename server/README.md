@@ -1,6 +1,6 @@
 # Backend ກາງ: feedback + ສະຖິຕິຄົນເຂົ້າ + admin ຂອງທຸກເວັບ
 
-ທຸກໂປຣເຈັກສົ່ງຂໍ້ມູນມາລວມທີ່ນີ້ ແລ້ວເບິ່ງໄດ້ທີ່ https://lotto-ramdom.online/admin/ (ມີແທັບແຍກຕາມເວັບ)
+ທຸກໂປຣເຈັກສົ່ງຂໍ້ມູນມາລວມທີ່ນີ້ ແລ້ວເບິ່ງໄດ້ທີ່ https://vongpasith.site/admin/ (ມີແທັບແຍກຕາມເວັບ) — lotto-ramdom.online/admin/ ຈະສົ່ງຕໍ່ໄປທີ່ນັ້ນ
 
 `server.mjs` ເປັນ Node ລ້ວນ (ບໍ່ຕ້ອງ `npm install`, ໃຊ້ Node 18 ຂຶ້ນໄປ). ຂໍ້ມູນເກັບເປັນໄຟລ໌ JSON ໃນ `DATA_DIR`:
 
@@ -44,10 +44,10 @@
 - ອັບເດດ: ພຽງ `git push` ແລ້ວລໍຖ້າ ≤ 15 ນາທີ — cron ແລ່ນ [`lotto-sync.sh`](lotto-sync.sh) (ຕິດຕັ້ງເປັນ `/usr/local/bin/lotto-sync`)
   ດຶງໂຄ້ດ, copy ໄຟລ໌ໜ້າເວັບ, ແລະ restart backend ຖ້າ `server.mjs` ປ່ຽນ. ໄຟລ໌ໜ້າເວັບໃໝ່ຕ້ອງເພີ່ມໃນລາຍການ rsync ຂອງສະຄຣິບນີ້
 - backend: `systemctl status lotto-api` (ໄຟລ໌ [`lotto-api.service`](lotto-api.service)), ລະຫັດ admin ແລະ `SITES` ຢູ່ `/etc/lotto-api.env`
-- Caddy: `/etc/caddy/lotto.caddy` ມີ `handle /api/* { reverse_proxy 127.0.0.1:3011 }`
+- Caddy: `/etc/caddy/lotto.caddy` ມີ `handle /api/* { reverse_proxy 127.0.0.1:3011 }` ແລະ `/admin/*` → vongpasith.site · ໜ້າ admin: [`vongpasith.caddy`](vongpasith.caddy)
 - ພອດ 3011 ເພາະ 3001 ເປັນຂອງ HanGan ຢູ່ແລ້ວ
 
-ໜ້າ admin: https://lotto-ramdom.online/admin/
+ໜ້າ admin: https://vongpasith.site/admin/
 
 ## ທົດສອບໃນເຄື່ອງ
 

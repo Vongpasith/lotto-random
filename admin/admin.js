@@ -13,7 +13,7 @@
   let current = "all";
   try { current = localStorage.getItem("admin.site") || "all"; } catch {}
 
-  const onSite = ["lotto-ramdom.online", "localhost", "127.0.0.1"].includes(location.hostname);
+  const onSite = ["vongpasith.site", "lotto-ramdom.online", "localhost", "127.0.0.1"].includes(location.hostname);
   if (!onSite) { $("offline").hidden = false; return; }
 
   // ສ້າງ element ແບບປອດໄພ (ໃຊ້ textContent ກັນ script ຈາກ feedback)
