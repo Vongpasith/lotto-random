@@ -18,4 +18,5 @@
 ## ອັບເດດຜົນຫວຍອັດຕະໂນມັດ
 - `node scripts/update-results.mjs` ດຶງງວດໃໝ່ຈາກ [kapook](https://lottery.kapook.com/laolottery/history) ມາຕໍ່ທ້າຍ `lotto_result` ແລ້ວສ້າງ `data.js` ໃໝ່
 - GitHub Actions (`.github/workflows/update-results.yml`) ແລ່ນເອງ ຈັນ–ສຸກ 20:30, 21:45 ແລະ 00:30 ເວລາລາວ ແລ້ວ commit ໃຫ້
+- server ກໍດຶງຜົນເອງທຸກ 5 ນາທີ ຊ່ວງ ຈັນ–ສຸກ 20:00–02:00 (`server/lotto-sync.sh`) ເວັບຈຶ່ງອັບເດດໄດ້ເຖິງ GitHub ຈະຊ້າ
 - ຖ້າຫາງວດລ່າສຸດໃນໄຟລ໌ບໍ່ພົບ ຫຼື ໜ້າເວັບປ່ຽນຮູບແບບ workflow ຈະ fail ແລະ GitHub ຈະສົ່ງອີເມວແຈ້ງ
