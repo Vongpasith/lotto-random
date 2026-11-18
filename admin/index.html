@@ -6,77 +6,61 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Admin · ທຸກເວັບ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap">
-  <link rel="stylesheet" href="../style.css?v=202610221700">
-  <link rel="stylesheet" href="admin.css?v=202610221700">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="admin.css?v=202611181500">
+  <script>try { const t = localStorage.getItem("admin.theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 </head>
 <body>
-  <header>
-    <h1>🔐 Admin</h1>
-    <p class="sub">ສະຖິຕິຄົນເຂົ້າ ແລະ feedback ຂອງທຸກເວັບ</p>
-  </header>
+  <!-- ເຂົ້າສູ່ລະບົບ -->
+  <div id="loginView" class="login-wrap" hidden>
+    <form id="loginForm" class="card login">
+      <div class="brand-mark">📊</div>
+      <h1>Admin</h1>
+      <p class="muted">ສະຖິຕິ, feedback ແລະ ສະພາບເຊີບເວີ ຂອງທຸກເວັບ</p>
+      <input id="password" type="password" autocomplete="current-password" placeholder="ລະຫັດຜ່ານ" required>
+      <button class="btn primary" type="submit">ເຂົ້າສູ່ລະບົບ</button>
+      <p id="loginMsg" class="msg" role="status"></p>
+    </form>
+  </div>
 
-  <main>
-    <!-- ເຂົ້າສູ່ລະບົບ -->
-    <section id="loginView" class="card login" hidden>
-      <h2>ເຂົ້າສູ່ລະບົບ</h2>
-      <form id="loginForm" class="controls">
-        <input id="password" type="password" autocomplete="current-password" placeholder="ລະຫັດຜ່ານ" required>
-        <button class="primary" type="submit">ເຂົ້າສູ່ລະບົບ</button>
-      </form>
-      <p id="loginMsg" class="hint" role="status"></p>
-    </section>
-
-    <!-- dashboard -->
-    <div id="dashView" hidden>
-      <div class="toolbar">
-        <span id="updated" class="hint"></span>
-        <span>
-          <button id="refreshBtn">ໂຫຼດໃໝ່</button>
-          <button id="logoutBtn">ອອກຈາກລະບົບ</button>
-        </span>
+  <div id="app" class="app" hidden>
+    <aside id="sidebar" class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">📊</span>
+        <div><strong>Vongpasith</strong><small>Admin ທຸກເວັບ</small></div>
       </div>
+      <nav id="nav" class="nav" aria-label="ເມນູ"></nav>
+      <div class="side-foot">
+        <button id="themeBtn" class="nav-item" type="button"><span class="ico">🌓</span><span>ສະຫຼັບສີ</span></button>
+        <button id="logoutBtn" class="nav-item" type="button"><span class="ico">↩</span><span>ອອກຈາກລະບົບ</span></button>
+      </div>
+    </aside>
+    <div id="scrim" class="scrim"></div>
 
-      <nav id="siteTabs" class="tabs" role="tablist" aria-label="ເລືອກເວັບ"></nav>
-
-      <section class="kpis" id="kpis"></section>
-
-      <section class="card">
-        <h2>ຄົນເຂົ້າ 30 ມື້ຫຼ້າສຸດ</h2>
-        <div class="legend"><span class="sw uniq"></span> ຄົນ (ບໍ່ຊ້ຳ) <span class="sw views"></span> ຄັ້ງທີ່ເປີດໜ້າ</div>
-        <div id="chart" class="chart"></div>
-      </section>
-
-      <section class="grid2">
-        <div class="card">
-          <h2>ອຸປະກອນ (30 ມື້)</h2>
-          <div id="devices"></div>
+    <main class="main">
+      <header class="topbar">
+        <button id="menuBtn" class="icon-btn menu-btn" type="button" aria-label="ເປີດເມນູ">☰</button>
+        <div class="title">
+          <h1 id="pageTitle"></h1>
+          <p id="pageSub" class="muted"></p>
         </div>
-        <div class="card">
-          <h2>ມາຈາກໃສ (30 ມື້)</h2>
-          <div id="refs"></div>
+        <div class="top-actions">
+          <div id="periods" class="chips" role="group" aria-label="ຊ່ວງເວລາ"></div>
+          <span id="updated" class="muted small"></span>
+          <button id="refreshBtn" class="icon-btn" type="button" title="ໂຫຼດໃໝ່" aria-label="ໂຫຼດໃໝ່">↻</button>
         </div>
-      </section>
+      </header>
 
-      <section class="card">
-        <h2>ໜ້າທີ່ເປີດຫຼາຍ (30 ມື້)</h2>
-        <div id="pages" class="pages"></div>
-      </section>
+      <div id="content" class="content"></div>
+    </main>
+  </div>
 
-      <section class="card">
-        <div class="fb-head">
-          <h2>Feedback</h2>
-          <label class="hint"><input type="checkbox" id="onlyUnread"> ສະເພາະທີ່ຍັງບໍ່ໄດ້ອ່ານ</label>
-        </div>
-        <div id="fbList" class="fb-list"></div>
-      </section>
-    </div>
+  <div id="tip" class="tip" hidden></div>
 
-    <p id="offline" class="card hint" hidden>
-      ໜ້າ admin ໃຊ້ໄດ້ສະເພາະທີ່ <a href="https://vongpasith.site/admin/">vongpasith.site/admin</a>
-    </p>
-  </main>
+  <p id="offline" class="card offline" hidden>
+    ໜ້າ admin ໃຊ້ໄດ້ສະເພາະທີ່ <a href="https://vongpasith.site/admin/">vongpasith.site/admin</a>
+  </p>
 
-  <script src="admin.js?v=202610221700"></script>
+  <script src="admin.js?v=202611181500"></script>
 </body>
 </html>

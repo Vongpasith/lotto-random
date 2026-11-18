@@ -15,6 +15,8 @@ Environment=DATA_DIR=/var/lib/lotto-api
 Restart=always
 RestartSec=3
 DynamicUser=yes
+# ອ່ານ log ssh (journal) ແລະ fail2ban (/var/log, ກຸ່ມ adm) ສຳລັບແທັບເຊີບເວີ — ອ່ານຢ່າງດຽວ
+SupplementaryGroups=systemd-journal adm
 StateDirectory=lotto-api
 NoNewPrivileges=yes
 ProtectSystem=strict

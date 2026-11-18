@@ -10,10 +10,17 @@
 //   HOME_SITE       ລະຫັດເວັບຂອງໂດເມນນີ້ເອງ ຄ່າເລີ່ມຕົ້ນ lotto
 //   COOKIE_SECURE   ຕັ້ງເປັນ 0 ເວລາທົດສອບໃນເຄື່ອງ (http)
 //   STATIC_DIR      (ສະເພາະທົດສອບ) ໃຫ້ server ນີ້ເສີບໄຟລ໌ໜ້າເວັບນຳ — ເທິງ server ແທ້ໃຫ້ Caddy ເຮັດ
+//   SERVER_UNITS    systemd service ທີ່ສະແດງໃນແທັບເຊີບເວີ ຂັ້ນດ້ວຍ , (ເບິ່ງ DEFAULT_UNITS)
+//   SERVER_SITES    ເວັບທີ່ກວດ HTTPS ໃນແທັບເຊີບເວີ (host/path ຂັ້ນດ້ວຍ ,) ເບິ່ງ DEFAULT_CHECKS
+//   SERVER_PORTS    ພອດໃນເຄື່ອງທີ່ກວດ (ຊື່=ພອດ ຂັ້ນດ້ວຍ ,) ເບິ່ງ DEFAULT_PORTS
 import http from "node:http";
+import https from "node:https";
+import net from "node:net";
 import crypto from "node:crypto";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
+import { execFile } from "node:child_process";
 
 const PORT = +(process.env.PORT || 3001);
 const DATA_DIR = path.resolve(process.env.DATA_DIR || "./data");
@@ -26,6 +33,13 @@ const SESSION_DAYS = 7;
 const KEEP_DAYS = 400;          // ເກັບສະຖິຕິລາຍວັນຍ້ອນຫຼັງ
 const MAX_FEEDBACK = 5000;
 const MAX_KEYS = 100;           // ຈຳນວນໜ້າ / ເວັບຕົ້ນທາງ ສູງສຸດຕໍ່ມື້ (ກັນໄຟລ໌ໃຫຍ່ເກີນ)
+const DEFAULT_UNITS = "caddy,docker,lotto-api,fakhan,festival-api,electic,oneday,ninemotor-frontend,ninemotor-backend";
+const DEFAULT_CHECKS = "vongpasith.site/admin/,lotto-ramdom.online/,fakhan.tech/,hangan.site/,festival.vongpasith.site/,thatluang.vongpasith.site/,electic.vongpasith.site/,oneday.vongpasith.site/,ninemotor.vongpasith.site/,ninemotor-admin.vongpasith.site/admin";
+const DEFAULT_PORTS = "ninemotor-db=5434,hangan-backend=8081,hangan-frontend=3001";
+const list = (s) => s.split(",").map((x) => x.trim()).filter(Boolean);
+const UNITS = list(process.env.SERVER_UNITS || DEFAULT_UNITS).filter((u) => /^[\w@.-]+$/.test(u));
+const CHECKS = list(process.env.SERVER_SITES || DEFAULT_CHECKS);
+const PORTS = list(process.env.SERVER_PORTS || DEFAULT_PORTS).map((p) => p.split("=")).filter(([n, p]) => n && +p > 0);
 
 // ໂດເມນ (host ລວມ port ຖ້າມີ) → ລະຫັດເວັບ
 const SITES = new Map(
@@ -94,6 +108,219 @@ function flush() {
 dirty.stats = dirty.feedback = true; // ບັນທຶກຮູບແບບໃໝ່ລົງໄຟລ໌ເລີຍ
 setInterval(flush, 10_000).unref();
 for (const sig of ["SIGINT", "SIGTERM"]) process.on(sig, () => { flush(); process.exit(0); });
+
+// ---------- ສະພາບເຊີບເວີ (ແທັບເຊີບເວີໃນ admin) ----------
+// ເກັບ CPU / RAM ທຸກ 1 ນາທີ ຍ້ອນຫຼັງ 24 ຊົ່ວໂມງ (ໃນໜ່ວຍຄວາມຈຳ, restart ແລ້ວເລີ່ມໃໝ່)
+function cpuTimes() {
+  let idle = 0, total = 0;
+  for (const c of os.cpus()) {
+    for (const v of Object.values(c.times)) total += v;
+    idle += c.times.idle;
+  }
+  return { idle, total };
+}
+function memInfo() {
+  const total = os.totalmem();
+  let available = os.freemem(), swapTotal = 0, swapFree = 0;
+  try {
+    const m = Object.fromEntries(fs.readFileSync("/proc/meminfo", "utf8").split("\n")
+      .map((l) => l.match(/^(\w+):\s+(\d+)/)).filter(Boolean).map((x) => [x[1], +x[2] * 1024]));
+    available = m.MemAvailable ?? available;
+    swapTotal = m.SwapTotal || 0;
+    swapFree = m.SwapFree || 0;
+  } catch {}
+  return { total, used: total - available, swapTotal, swapUsed: swapTotal - swapFree };
+}
+let lastCpu = cpuTimes();
+let cpuNow = 0;
+const history = [];
+function sample() {
+  const t = cpuTimes();
+  const dt = t.total - lastCpu.total;
+  cpuNow = dt > 0 ? Math.round((1 - (t.idle - lastCpu.idle) / dt) * 1000) / 10 : 0;
+  lastCpu = t;
+  const m = memInfo();
+  history.push({ t: Date.now(), cpu: cpuNow, mem: Math.round((m.used / m.total) * 1000) / 10 });
+  if (history.length > 1440) history.shift();
+}
+setTimeout(sample, 5000).unref(); // ຈຸດທຳອິດໄວໆ ບໍ່ຕ້ອງລໍ 1 ນາທີ
+setInterval(sample, 60_000).unref();
+
+function run(cmd, args) {
+  return new Promise((resolve) => execFile(cmd, args, { timeout: 8000, maxBuffer: 64 << 20 }, (err, out) => resolve(err && !out ? "" : String(out))));
+}
+const readText = (p) => { try { return fs.readFileSync(p, "utf8"); } catch { return null; } };
+const topN = (map, n) => [...map].sort((a, b) => b[1] - a[1]).slice(0, n);
+// ສະຖານະ service ອ່ານຈາກ cgroup ເພາະ service ແບບ DynamicUser ໃຊ້ systemctl (D-Bus) ບໍ່ໄດ້
+// cgroup ມີ process = ເຮັດວຽກ, ເວລາສ້າງ cgroup = ເວລາເລີ່ມ
+function unitStates() {
+  return UNITS.map((u) => {
+    const dir = `/sys/fs/cgroup/system.slice/${u}.service`;
+    const procs = readText(dir + "/cgroup.procs");
+    if (procs === null) return { name: u, state: "inactive", memory: null, since: null };
+    const mem = Number(readText(dir + "/memory.current"));
+    return {
+      name: u,
+      state: procs.trim() ? "active" : "inactive",
+      memory: Number.isFinite(mem) ? mem : null,
+      since: fs.statSync(dir).ctimeMs,
+    };
+  });
+}
+// ພອດໃນເຄື່ອງ (container ຂອງ docker ທີ່ບໍ່ມີ systemd service) — ເຊື່ອມຕໍ່ TCP ໄດ້ = ເຮັດວຽກ
+function portCheck([name, port]) {
+  const start = performance.now();
+  return new Promise((resolve) => {
+    const sock = net.connect({ host: "127.0.0.1", port: +port, timeout: 3000 });
+    const done = (ok) => { sock.destroy(); resolve({ name, port: +port, ok, ms: Math.round(performance.now() - start) }); };
+    sock.on("connect", () => done(true));
+    sock.on("timeout", () => done(false));
+    sock.on("error", () => done(false));
+  });
+}
+// ຍິງ HTTPS ຫາ Caddy ໃນເຄື່ອງນີ້ (127.0.0.1:443) ດ້ວຍຊື່ໂດເມນແທ້ → ໄດ້ທັງ status, ຄວາມໄວ ແລະ ວັນໝົດອາຍຸໃບຮັບຮອງ
+function checkSite(target) {
+  const host = target.split("/")[0];
+  const p = target.slice(host.length) || "/";
+  const start = performance.now();
+  return new Promise((resolve) => {
+    const done = (r) => resolve({ site: target, ms: Math.round(performance.now() - start), ...r });
+    const req = https.request({ host: "127.0.0.1", port: 443, path: p, servername: host, headers: { Host: host, "User-Agent": "server-status-monitor" }, timeout: 8000 }, (res) => {
+      const cert = res.socket.getPeerCertificate?.();
+      res.resume();
+      done({ status: res.statusCode, certExpires: cert?.valid_to ? Date.parse(cert.valid_to) : null });
+    });
+    req.on("timeout", () => req.destroy(new Error("timeout")));
+    req.on("error", (e) => done({ status: 0, error: e.message }));
+    req.end();
+  });
+}
+// ---------- ຄວາມປອດໄພ: ໃຜພະຍາຍາມເຂົ້າເຄື່ອງ ----------
+// ອ່ານ log ຂອງ ssh ຈາກ journal (service ຕ້ອງຢູ່ກຸ່ມ systemd-journal + adm, ເບິ່ງ lotto-api.service)
+const adminFails = []; // ລະຫັດ admin ຜິດ (ໃນໜ່ວຍຄວາມຈຳ)
+async function sshEvents() {
+  const out = await run("journalctl", ["-u", "ssh", "--since", "-7 days", "-o", "short-unix", "--no-pager", "-q",
+    "-g", "Accepted |Failed password|Invalid user|maximum authentication attempts"]);
+  const ok = [], fails = [];
+  for (const line of out.split("\n")) {
+    const t = Math.round(parseFloat(line) * 1000);
+    if (!t) continue;
+    let m;
+    if ((m = line.match(/Accepted (\S+) for (\S+) from (\S+) port \d+/))) ok.push({ t, method: m[1], user: m[2], ip: m[3] });
+    else if ((m = line.match(/Failed password for (?:invalid user )?(\S+) from (\S+)/))) fails.push({ t, user: m[1], ip: m[2] });
+    else if ((m = line.match(/Invalid user (\S*) from (\S+)/))) fails.push({ t, user: m[1] || "(ວ່າງ)", ip: m[2] });
+  }
+  return { readable: out.length > 0 || !!(await run("journalctl", ["-u", "ssh", "-n", "1", "-q", "--no-pager"])), ok, fails };
+}
+function fail2banBans() {
+  const text = [readText("/var/log/fail2ban.log.1"), readText("/var/log/fail2ban.log")].filter(Boolean).join("\n");
+  if (!text) return null;
+  const since = Date.now() - 7 * 86400_000, active = new Map();
+  let bans7d = 0;
+  for (const line of text.split("\n")) {
+    const m = line.match(/^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d).*\[(\S+)\] (Ban|Unban) (\S+)/);
+    if (!m) continue;
+    const t = Date.parse(m[1].replace(" ", "T") + "+07:00");
+    if (m[3] === "Ban") { active.set(m[4], { ip: m[4], jail: m[2], t }); if (t > since) bans7d++; }
+    else active.delete(m[4]);
+  }
+  return { bans7d, banned: [...active.values()].sort((a, b) => b.t - a.t) };
+}
+// ຄ່າໃນ sshd_config (ຄ່າທຳອິດທີ່ພົບຊະນະ ຕາມກົດຂອງ sshd; ໄຟລ໌ໃນ sshd_config.d ຖືກ include ກ່ອນ)
+function sshdSetting(key) {
+  const dir = "/etc/ssh/sshd_config.d";
+  let files = [];
+  try { files = fs.readdirSync(dir).filter((f) => f.endsWith(".conf")).sort().map((f) => path.join(dir, f)); } catch {}
+  for (const f of [...files, "/etc/ssh/sshd_config"]) {
+    const text = readText(f);
+    if (text === null) return "unknown"; // ໄຟລ໌ທີ່ອ່ານບໍ່ໄດ້ (ເຊັ່ນ 50-cloud-init.conf) ອາດມີຄ່າທີ່ຊະນະ
+    const m = text.match(new RegExp(`^\\s*${key}\\s+(\\S+)`, "im"));
+    if (m) return m[1].toLowerCase();
+  }
+  return null;
+}
+async function securityStatus() {
+  const [ssh, ports, ps] = await Promise.all([
+    sshEvents(),
+    run("ss", ["-tulnH"]),
+    run("ps", ["-eo", "user:12,pid,ppid,pcpu,pmem,etimes,comm", "--sort=-pcpu", "--no-headers"]),
+  ]);
+  const day = Date.now() - 86400_000;
+  const failIps = new Map(), failUsers = new Map();
+  for (const f of ssh.fails) {
+    failIps.set(f.ip, (failIps.get(f.ip) || 0) + 1);
+    failUsers.set(f.user, (failUsers.get(f.user) || 0) + 1);
+  }
+  const perDay = {};
+  for (const f of ssh.fails) {
+    const d = new Date(f.t + 7 * 3600_000).toISOString().slice(0, 10);
+    perDay[d] = (perDay[d] || 0) + 1;
+  }
+  const okByIp = new Map();
+  for (const o of ssh.ok) {
+    const e = okByIp.get(o.ip) || { ip: o.ip, count: 0, last: 0, users: new Set(), methods: new Set() };
+    e.count++; e.last = Math.max(e.last, o.t); e.users.add(o.user); e.methods.add(o.method);
+    okByIp.set(o.ip, e);
+  }
+  const listening = [...new Set(ports.split("\n").map((l) => l.trim().split(/\s+/)).filter((c) => c.length >= 5)
+    .filter((c) => !/^(127\.|\[::1\]|\[::ffff:127\.)/.test(c[4]) && !c[4].includes("%lo"))
+    .map((c) => `${c[0]} ${c[4].replace(/^(0\.0\.0\.0|\*|\[::\]):/, "*:")}`))];
+  const shellUsers = (readText("/etc/passwd") || "").split("\n").map((l) => l.split(":"))
+    .filter((c) => c.length > 6 && !/(nologin|false|sync)$/.test(c[6])).map((c) => c[0]);
+  const updates = (readText("/var/lib/update-notifier/updates-available") || "").match(/(\d+) updates? can be applied/);
+  return {
+    sshReadable: ssh.readable,
+    sshFails24h: ssh.fails.filter((f) => f.t > day).length,
+    sshFails7d: ssh.fails.length,
+    sshFailsPerDay: perDay,
+    topIps: topN(failIps, 10),
+    topUsers: topN(failUsers, 10),
+    logins: [...okByIp.values()].sort((a, b) => b.last - a.last).slice(0, 15)
+      .map((e) => ({ ...e, users: [...e.users], methods: [...e.methods] })),
+    fail2ban: { running: !!readText("/sys/fs/cgroup/system.slice/fail2ban.service/cgroup.procs")?.trim(), ...(fail2banBans() || { bans7d: null, banned: [] }) },
+    passwordAuth: sshdSetting("PasswordAuthentication") ?? "yes",
+    rootLogin: sshdSetting("PermitRootLogin") ?? "prohibit-password",
+    listening,
+    shellUsers,
+    // ບໍ່ນັບຄຳສັ່ງທີ່ຕົວນີ້ເອີ້ນເອງ (ps, ss, journalctl)
+    processes: ps.trim().split("\n").filter(Boolean).map((l) => {
+      const [user, pid, ppid, cpu, mem, etimes, ...cmd] = l.trim().split(/\s+/);
+      return { user, pid: +pid, ppid: +ppid, cpu: +cpu, mem: +mem, secs: +etimes, cmd: cmd.join(" ") };
+    }).filter((p) => p.ppid !== process.pid).slice(0, 10).map(({ ppid, ...p }) => p),
+    rebootRequired: fs.existsSync("/var/run/reboot-required"),
+    updates: updates ? +updates[1] : null,
+    adminFails: adminFails.slice(-20).reverse(),
+  };
+}
+
+let serverCache = { at: 0, data: null };
+async function serverStatus() {
+  if (serverCache.data && Date.now() - serverCache.at < 15_000) return serverCache.data;
+  const [ports, sites, security] = await Promise.all([Promise.all(PORTS.map(portCheck)), Promise.all(CHECKS.map(checkSite)), securityStatus()]);
+  const units = unitStates();
+  let disk = null;
+  try {
+    const s = fs.statfsSync("/");
+    disk = { total: s.blocks * s.bsize, used: (s.blocks - s.bfree) * s.bsize };
+  } catch {}
+  const data = {
+    now: Date.now(),
+    host: os.hostname(),
+    uptime: os.uptime(),
+    cpus: os.cpus().length,
+    load: os.loadavg(),
+    cpu: cpuNow,
+    mem: memInfo(),
+    disk,
+    units,
+    ports,
+    sites,
+    security,
+    history,
+  };
+  serverCache = { at: Date.now(), data };
+  return data;
+}
 
 // ---------- ເຄື່ອງມື ----------
 function today() {
@@ -302,7 +529,11 @@ const routes = {
   "POST /api/admin/login": async (req, res) => {
     if (limited("login:" + ipKey(req), 10, 15 * 60_000)) return send(res, 429, { error: "ລອງຫຼາຍເກີນໄປ ລໍຖ້າ 15 ນາທີ" });
     const body = await readBody(req, 1000);
-    if (!body || !passwordOk(body.password || "")) return send(res, 401, { error: "ລະຫັດຜ່ານບໍ່ຖືກ" });
+    if (!body || !passwordOk(body.password || "")) {
+      adminFails.push({ t: Date.now(), ip: clientIp(req) });
+      if (adminFails.length > 200) adminFails.shift();
+      return send(res, 401, { error: "ລະຫັດຜ່ານບໍ່ຖືກ" });
+    }
     const flags = `HttpOnly; SameSite=Strict; Path=/api/admin; Max-Age=${SESSION_DAYS * 86400}${COOKIE_SECURE ? "; Secure" : ""}`;
     send(res, 200, { ok: true }, { "Set-Cookie": `admin=${makeToken()}; ${flags}` });
   },
@@ -323,6 +554,9 @@ const routes = {
       };
     }
     send(res, 200, { today: today(), sites });
+  },
+  "GET /api/admin/server": async (req, res) => {
+    send(res, 200, { ...(await serverStatus()), you: clientIp(req) });
   },
   "GET /api/admin/feedback": async (req, res) => {
     send(res, 200, { items: [...feedback].reverse() });
