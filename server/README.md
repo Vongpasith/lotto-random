@@ -38,7 +38,7 @@
 | `POST /api/admin/login` | ເຂົ້າສູ່ລະບົບ admin (ຈຳກັດ 10 ຄັ້ງ / 15 ນາທີ) |
 | `GET /api/admin/stats`, `GET /api/admin/feedback` | ຂໍ້ມູນສຳລັບໜ້າ `/admin/` |
 
-## ຕິດຕັ້ງເທິງ server (VPS 187.77.149.133, ຕິດຕັ້ງແລ້ວ)
+## ຕິດຕັ້ງເທິງ server (VPS 155.133.199.79, ຕິດຕັ້ງແລ້ວ)
 
 - ໂຄ້ດ: `/opt/lotto-random-src` (git clone) · ໜ້າເວັບ: `/var/www/lotto-random` · ຂໍ້ມູນ: `/var/lib/lotto-api`
 - ອັບເດດ: ພຽງ `git push` ແລ້ວລໍຖ້າ ≤ 15 ນາທີ — cron ແລ່ນ [`lotto-sync.sh`](lotto-sync.sh) (ຕິດຕັ້ງເປັນ `/usr/local/bin/lotto-sync`)
